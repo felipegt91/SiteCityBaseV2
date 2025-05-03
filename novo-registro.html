@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CityBase - Novo Registro</title>
+    
+    <!-- Pré-conexões para performance -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fontes -->
+    <link href="https://fonts.googleapis.com/css2?family=REM:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['REM', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#4F46E5',
+                        danger: '#DC2626',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .invalid {
+            border-color: #DC2626;
+            box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
+        }
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans min-h-screen flex flex-col">
+    <!-- Cabeçalho padronizado -->
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <!-- Logo + Nome (link para index) -->
+            <a href="index.html" class="flex items-center space-x-3">
+                <div class="bg-primary text-white p-2 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                </div>
+                <h1 class="text-xl font-bold text-gray-800">CityBase</h1>
+            </a>
+    
+            <!-- Navegação principal (desktop) -->
+            <div class="hidden md:flex items-center justify-between w-full ml-6">
+                <nav class="flex space-x-6">
+                    <a href="novo-registro.html" class="font-medium hover:text-primary">Reportar</a>
+                    <a href="index.html#status" class="font-medium hover:text-primary">Registros</a>
+                    <a href="index.html#map" class="font-medium hover:text-primary">Mapa</a>
+                </nav>
+                
+                <!-- Usuário + Logout -->
+                <div class="flex items-center space-x-4 ml-6">
+                    <span class="font-medium text-gray-700">Olá, <span id="userName">Usuário</span></span>
+                    <button id="logoutBtn" class="px-4 py-2 bg-danger text-white rounded-lg hover:bg-red-700 transition">Sair</button>
+                </div>
+            </div>
+    
+            <!-- Menu mobile (ícone) -->
+            <button class="md:hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+    
+        <!-- Menu mobile (conteúdo) -->
+        <div class="md:hidden hidden px-4 pb-4" id="mobileMenu">
+            <nav class="flex flex-col space-y-2">
+                <a href="novo-registro.html" class="px-3 py-2 font-medium hover:text-primary">Reportar</a>
+                <a href="index.html#status" class="px-3 py-2 font-medium hover:text-primary">Registros</a>
+                <a href="index.html#map" class="px-3 py-2 font-medium hover:text-primary">Mapa</a>
+                <div class="border-t pt-2 mt-2">
+                    <span class="block px-3 py-2 text-gray-700">Usuário: <span id="mobileUserName">Usuário</span></span>
+                    <button id="mobileLogoutBtn" class="w-full text-left px-3 py-2 text-danger font-medium hover:bg-red-50 rounded">Sair</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="bg-primary px-6 py-4">
+                <h2 class="text-xl font-bold text-white">Registrar Novo Problema</h2>
+            </div>
+            
+            <form id="registroForm" class="p-6 space-y-6">
+                <!-- Seção: Detalhes do Problema -->
+                <fieldset class="space-y-4">
+                    <!-- Campo: Tipo de Problema -->
+                    <div>
+                        <label for="tipo" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Problema*</label>
+                        <select id="tipo" name="tipo" required
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <option value="">Selecione...</option>
+                            <option value="buraco">Buraco na via</option>
+                            <option value="iluminacao">Iluminação pública</option>
+                            <option value="lixo">Acúmulo de lixo</option>
+                            <option value="agua">Vazamento de água</option>
+                            <option value="outros">Outros</option>
+                        </select>
+                        <p class="mt-1 text-sm text-danger hidden" id="tipoError">Selecione um tipo</p>
+                    </div>
+                    
+                    <!-- Localização com opções -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Localização*</label>
+                        
+                        <div class="flex space-x-2 mb-2">
+                            <button type="button" id="getLocationBtn" 
+                                class="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-indigo-700 transition">
+                                Usar Minha Localização
+                            </button>
+                            <button type="button" id="manualLocationBtn"
+                                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                                Inserir Manualmente
+                            </button>
+                        </div>
+                        
+                        <!-- Campo de localização (inicialmente oculto) -->
+                        <div id="manualLocationField" class="hidden">
+                            <input type="text" id="localizacaoManual" name="localizacaoManual"
+                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
+                                placeholder="Digite o endereço completo">
+                        </div>
+                        
+                        <!-- Mostra a localização obtida -->
+                        <input type="text" id="localizacao" name="localizacao" required readonly
+                            class="w-full px-4 py-2 border rounded-lg bg-gray-100 mt-2 hidden"
+                            placeholder="Endereço será preenchido automaticamente">
+                            
+                        <p class="mt-1 text-sm text-gray-500" id="locationStatus">Selecione uma opção acima</p>
+                        <p class="mt-1 text-sm text-danger hidden" id="localizacaoError">É necessário informar a localização</p>
+                    </div>
+                    
+                    <!-- Descrição -->
+                    <div>
+                        <label for="descricao" class="block text-sm font-medium text-gray-700 mb-1">Descrição Detalhada*</label>
+                        <textarea id="descricao" name="descricao" rows="4" required
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                            placeholder="Descreva o problema com detalhes"></textarea>
+                        <p class="mt-1 text-sm text-danger hidden" id="descricaoError">Descreva o problema</p>
+                    </div>
+                    
+                    <!-- Anexar Fotos (limitado a 4) -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Anexar Fotos (Máx. 4)*</label>
+                        <div class="mt-1 flex items-center">
+                            <label for="fotos" class="cursor-pointer bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg border border-gray-300">
+                                <span class="text-sm">Selecionar fotos</span>
+                                <input type="file" id="fotos" name="fotos" accept="image/*" multiple 
+                                    max="4" class="sr-only">
+                            </label>
+                            <span id="fileName" class="ml-2 text-sm text-gray-500">Nenhuma foto selecionada</span>
+                        </div>
+                        <div id="preview" class="mt-2 grid grid-cols-4 gap-2 hidden"></div>
+                        <p class="mt-1 text-sm text-danger hidden" id="fotosError">Adicione pelo menos 1 foto</p>
+                    </div>
+                </fieldset>
+                
+                <!-- Botões de ação -->
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="submit" id="submitBtn" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                        Enviar Registro
+                    </button>
+                    <button type="button" id="loadingBtn" class="px-6 py-2 bg-primary text-white rounded-lg hidden" disabled>
+                        <div class="flex items-center">
+                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Enviando...
+                        </div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto px-4 text-center">
+            <p>© 2025 CityBase - Plataforma Colaborativa</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verifica se o usuário está logado (simulação)
+            const user = JSON.parse(localStorage.getItem('citybase_user')) || {
+                name: "Usuário Teste",
+                email: "teste@dev.com"
+            };
+            
+            // Exibe o nome do usuário
+            document.getElementById('userName').textContent = user.name || 'Usuário';
+            
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                localStorage.removeItem('citybase_user');
+                window.location.href = 'login.html';
+            });
+            
+            // Elementos do formulário
+            const form = document.getElementById('registroForm');
+            const fileInput = document.getElementById('fotos');
+            const preview = document.getElementById('preview');
+            const locationInput = document.getElementById('localizacao');
+            const manualLocationField = document.getElementById('manualLocationField');
+            const manualLocationInput = document.getElementById('localizacaoManual');
+            const locationStatus = document.getElementById('locationStatus');
+            const getLocationBtn = document.getElementById('getLocationBtn');
+            const manualLocationBtn = document.getElementById('manualLocationBtn');
+            
+            // Alternar entre métodos de localização
+            manualLocationBtn.addEventListener('click', () => {
+                getLocationBtn.classList.remove('bg-primary', 'text-white');
+                getLocationBtn.classList.add('border', 'border-gray-300', 'bg-gray-50');
+                manualLocationBtn.classList.remove('border', 'border-gray-300', 'bg-gray-50');
+                manualLocationBtn.classList.add('bg-primary', 'text-white');
+                
+                manualLocationField.classList.remove('hidden');
+                locationInput.classList.add('hidden');
+                locationInput.removeAttribute('required');
+                manualLocationInput.setAttribute('required', '');
+                locationStatus.textContent = "Digite o endereço manualmente";
+            });
+            
+            getLocationBtn.addEventListener('click', () => {
+                manualLocationBtn.classList.remove('bg-primary', 'text-white');
+                manualLocationBtn.classList.add('border', 'border-gray-300', 'bg-gray-50');
+                getLocationBtn.classList.remove('border', 'border-gray-300', 'bg-gray-50');
+                getLocationBtn.classList.add('bg-primary', 'text-white');
+                
+                manualLocationField.classList.add('hidden');
+                manualLocationInput.removeAttribute('required');
+                locationInput.setAttribute('required', '');
+                getLocationBtn.disabled = true;
+                getLocationBtn.textContent = 'Obtendo...';
+                locationStatus.textContent = 'Obtendo localização...';
+                
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const { latitude, longitude } = position.coords;
+                            getAddressFromCoords(latitude, longitude)
+                                .then(address => {
+                                    locationInput.value = address;
+                                    locationInput.classList.remove('hidden');
+                                    locationStatus.textContent = `Localização obtida: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+                                    document.getElementById('localizacaoError').classList.add('hidden');
+                                });
+                            
+                            getLocationBtn.textContent = 'Localização obtida';
+                        },
+                        (error) => {
+                            locationStatus.textContent = 'Erro ao obter localização: ' + 
+                                (error.message || 'Permissão negada');
+                            getLocationBtn.textContent = 'Tentar novamente';
+                            getLocationBtn.disabled = false;
+                        }
+                    );
+                } else {
+                    locationStatus.textContent = 'Geolocalização não suportada';
+                    getLocationBtn.disabled = true;
+                }
+            });
+            
+            // Simulação de API de geocodificação
+            function getAddressFromCoords(lat, lng) {
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        resolve(`Próximo a ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+                    }, 1000);
+                });
+            }
+            
+            // Preview de imagens (limitado a 4)
+            fileInput.addEventListener('change', function(e) {
+                const files = Array.from(e.target.files).slice(0, 4);
+                preview.innerHTML = '';
+                
+                if (files.length > 0) {
+                    document.getElementById('fileName').textContent = 
+                        `${files.length} foto(s) selecionada(s)`;
+                    preview.classList.remove('hidden');
+                    
+                    files.forEach((file, index) => {
+                        if (!file.type.startsWith('image/')) return;
+                        
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            const container = document.createElement('div');
+                            container.className = 'relative';
+                            
+                            const img = document.createElement('img');
+                            img.src = event.target.result;
+                            img.className = 'h-20 w-full object-cover rounded border';
+                            img.alt = `Foto ${index + 1} do problema`;
+                            
+                            const badge = document.createElement('div');
+                            badge.className = 'absolute top-1 right-1 bg-black bg-opacity-50 text-white text-xs rounded-full px-2 py-1';
+                            badge.textContent = `${index + 1}/${files.length}`;
+                            
+                            container.appendChild(img);
+                            container.appendChild(badge);
+                            preview.appendChild(container);
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                } else {
+                    document.getElementById('fileName').textContent = 'Nenhuma foto selecionada';
+                    preview.classList.add('hidden');
+                }
+            });
+            
+            // Validação do formulário
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                let isValid = true;
+                const requiredFields = ['tipo', 'descricao'];
+                
+                // Valida campos obrigatórios
+                requiredFields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    const errorElement = document.getElementById(`${fieldId}Error`);
+                    
+                    if (!field.value.trim()) {
+                        field.classList.add('invalid');
+                        errorElement.classList.remove('hidden');
+                        isValid = false;
+                    }
+                });
+                
+                // Valida localização
+                const locationError = document.getElementById('localizacaoError');
+                if (getLocationBtn.classList.contains('bg-primary')) {
+                    if (!locationInput.value) {
+                        locationError.classList.remove('hidden');
+                        isValid = false;
+                    }
+                } else {
+                    if (!manualLocationInput.value) {
+                        locationError.classList.remove('hidden');
+                        isValid = false;
+                    }
+                }
+                
+                // Valida pelo menos 1 foto
+                if (fileInput.files.length === 0) {
+                    document.getElementById('fotosError').classList.remove('hidden');
+                    isValid = false;
+                }
+                
+                if (isValid) {
+                    // Simula envio
+                    document.getElementById('submitBtn').classList.add('hidden');
+                    document.getElementById('loadingBtn').classList.remove('hidden');
+                    
+                    setTimeout(() => {
+                        alert('Registro enviado com sucesso!');
+                        form.reset();
+                        preview.classList.add('hidden');
+                        document.getElementById('fileName').textContent = 'Nenhuma foto selecionada';
+                        document.getElementById('loadingBtn').classList.add('hidden');
+                        document.getElementById('submitBtn').classList.remove('hidden');
+                        locationStatus.textContent = 'Selecione uma opção acima';
+                        getLocationBtn.textContent = 'Usar Minha Localização';
+                        getLocationBtn.disabled = false;
+                        manualLocationField.classList.add('hidden');
+                        locationInput.classList.add('hidden');
+                    }, 1500);
+                }
+            });
+        });
+    </script>
+    <script>
+        // Menu mobile
+        document.querySelector('.md\\:hidden').addEventListener('click', () => {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+            
+            // Sincroniza nome do usuário
+            const userName = document.getElementById('userName').textContent;
+            document.getElementById('mobileUserName').textContent = userName;
+        });
+    
+        // Logout mobile
+        document.getElementById('mobileLogoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('citybase_user');
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>

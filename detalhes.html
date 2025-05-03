@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <!--Configurações e carregamento de estilos e bibliotecas necessárias-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CityBase | Detalhes do Registro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=REM:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-sans">
+    <!--Cabeçalho simplificado-->
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center space-x-3"> <!-- Link adicionado aqui -->
+                <div class="bg-indigo-600 text-white p-2 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                </div>
+                <h1 class="text-xl font-bold text-gray-800">CityBase</h1>
+            </a>
+            
+            <nav class="hidden md:flex space-x-6">
+                <a href="novo-registro.html" class="font-medium hover:text-indigo-600">Reportar</a>
+                <a href="index.html#status" class="font-medium hover:text-indigo-600">Registros</a>
+                <a href="index.html#map" class="font-medium hover:text-indigo-600">Mapa</a>
+            </nav>
+            
+            <div class="flex items-center space-x-4">
+                <a href="login.html" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Login</a>
+                <a href="cadastro.html" class="font-medium text-indigo-600 hover:underline">Cadastre-se</a>
+            </div>
+        </div>
+    </header>
+    
+    
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-sm p-6 md:p-8">
+            <!--Cbeçalho do registro-->
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">REG-20240001</h1>
+                    <p class="text-gray-600">Buraco na via pública</p>
+                </div>
+            </div>
+
+            <!--Informações do registro-->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div>
+                    <h3 class="font-semibold text-gray-700 mb-2">Data do Registro</h3>
+                    <p>15/05/2024 - 14:32</p>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-700 mb-2">Localização</h3>
+                    <p>Rua Principal, 100 - Centro</p>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-700 mb-2">Comunicante</h3>
+                    <p>João Silva (joao@exemplo.com)</p>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-700 mb-2">Dias desde registro</h3>
+                    <p id="dias-detalhe">0 dias</p>
+                </div>
+            </div>
+
+            <!--Descrição do registro-->
+            <div class="mb-8">
+                <h3 class="font-semibold text-gray-700 mb-2">Descrição</h3>
+                <p class="text-gray-800">Buraco de aproximadamente 50cm de diâmetro e 30cm de profundidade na pista direita da rua, após o quebra-molas. Já causou danos a dois veículos esta semana.</p>
+            </div>
+
+            <!--Localização do que foi registrado-->
+            <div class="mb-8">
+                <h3 class="font-semibold text-gray-700 mb-4">Localização Exata</h3>
+                <div id="detail-map" class="h-64 rounded-lg"></div>
+                <p class="text-sm text-gray-500 mt-2">
+                    Coordenadas: 20°26'07.3"S 54°37'09.9"W
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!--Rodapé do site-->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4 text-center">
+            <p>© 2025 CityBase</p>
+        </div>
+    </footer>
+
+    <!--Script necessário para o mapa-->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Cálculo de dias desde o registro
+            const dataRegistro = '15/05/2024';
+            const [dia, mes, ano] = dataRegistro.split('/');
+            const diff = new Date() - new Date(ano, mes-1, dia);
+            const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+            document.getElementById('dias-detalhe').textContent = 
+                `${dias} ${dias === 1 ? 'dia' : 'dias'}`;
+
+            // Coordenadas do registro
+            const lat = -20.435361;
+            const lng = -54.619417;
+            
+            // Configuração inicial do mapa
+            const detailMap = L.map('detail-map').setView([lat, lng], 17);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19, // Evita carregar tiles desnecessários
+                attribution: '...'
+            }).addTo(detailMap);
+            
+            // Marcador do registro no mapa
+            L.marker([lat, lng], {
+                icon: L.divIcon({
+                    className: 'problem-marker-detail',
+                    html: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#DC2626"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>',
+                    iconSize: [40, 40]
+                })
+            }).addTo(detailMap);
+        });
+    </script>
+</body>
+</html>

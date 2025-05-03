@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CityBase - Cadastro de Usuário</title>
+
+    <!--Pré-conexão a domínios externos-->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=REM:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Biblioteca para validação de CPF -->
+    <script src="https://cdn.jsdelivr.net/npm/cpf-check@3.0.0/dist/cpf.min.js" defer></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['REM', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#4F46E5',
+                        danger: '#DC2626',
+                        success: '#10B981'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .invalid {
+            border-color: #DC2626;
+            box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
+        }
+        
+        .valid {
+            border-color: #10B981;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+        }
+        
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans min-h-screen flex flex-col">
+    <!-- Cabeçalho -->
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center space-x-3"> <!-- Link adicionado aqui -->
+                <div class="bg-primary text-white p-2 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                </div>
+                <h1 class="text-xl font-bold text-gray-800">CityBase</h1>
+            </a>
+            <nav class="hidden md:flex justify-center space-x-6 w-full">
+                <a href="novo-registro.html" class="font-medium hover:text-primary">Reportar</a>
+                <a href="index.html#status" class="font-medium hover:text-primary">Registros</a>
+                <a href="index.html#map" class="font-medium hover:text-primary">Mapa</a>
+                <a href="login.html" class="font-medium text-primary hover:underline">Já tem conta? Faça login</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Conteúdo principal -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <div class="max-w-md mx-auto bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="bg-primary px-6 py-4">
+                <h2 class="text-xl font-bold text-white">Criar Nova Conta</h2>
+            </div>
+            
+            <form id="registroForm" class="p-6 space-y-4">
+                <!-- Nome Completo -->
+                <div>
+                    <label for="nome" id="labelNome" class="block text-sm font-medium text-gray-700 mb-1">Nome Completo*</label>
+                    <input 
+                        type="text" 
+                        id="nome" 
+                        name="nome" 
+                        required
+                        aria-labelledby="labelNome" 
+                        aria-required="true"
+                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
+                        placeholder="Digite seu nome completo">
+                    <p class="mt-1 text-sm text-danger hidden" id="nomeError">Campo obrigatório</p>
+                </div>
+
+                <!-- CPF -->
+                <div>
+                    <label for="cpf" id="labelCpf" class="block text-sm font-medium text-gray-700 mb-1">CPF*</label>
+                    <input 
+                        type="text" 
+                        id="cpf" 
+                        name="cpf" 
+                        required
+                        aria-labelledby="labelCpf" 
+                        aria-required="true"
+                        aria-describedby="cpfHelp"
+                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
+                        placeholder="000.000.000-00"
+                        maxlength="14">
+                    <p id="cpfHelp" class="mt-1 text-sm text-danger hidden" id="cpfError">CPF inválido</p>
+                </div>
+
+                <!-- Nome de Usuário -->
+                <div>
+                    <label for="username" id="labelUsername" class="block text-sm font-medium text-gray-700 mb-1">Nome de Usuário*</label>
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            required
+                            aria-labelledby="labelUsername" 
+                            aria-required="true"
+                            aria-describedby="usernameHelp usernameError usernameSuccess"
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
+                            placeholder="Escolha um nome de usuário">
+                        <div id="usernameLoading" class="absolute right-3 top-2.5 hidden" aria-hidden="true">
+                            <svg class="animate-spin h-5 w-5 text-gray-400 spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <p id="usernameHelp" class="mt-1 text-sm text-gray-500">Mínimo 4 caracteres, apenas letras, números e _</p>
+                    <p id="usernameError" class="mt-1 text-sm text-danger hidden">Nome de usuário já em uso</p>
+                    <p id="usernameSuccess" class="mt-1 text-sm text-success hidden">Nome de usuário disponível</p>
+                </div>
+
+                <!-- Senha -->
+                <div>
+                    <label for="senha" id="labelSenha" class="block text-sm font-medium text-gray-700 mb-1">Senha*</label>
+                    <div class="relative">
+                        <input 
+                            type="password" 
+                            id="senha" 
+                            name="senha" 
+                            required
+                            aria-labelledby="labelSenha" 
+                            aria-required="true"
+                            aria-describedby="senhaHelp"
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary pr-10"
+                            placeholder="Crie uma senha segura">
+                        <!-- Botão de mostrar/esconder senha -->
+                        <button 
+                            type="button" 
+                            onclick="togglePassword('senha')"
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-primary focus:outline-none"
+                            aria-label="Mostrar senha"
+                            aria-controls="senha">
+                            <svg id="eyeIcon-senha" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <p id="senhaHelp" class="mt-1 text-sm text-gray-500">Mínimo 8 caracteres</p>
+                </div>
+
+                <!-- Confirmação de Senha -->
+                <div>
+                    <label for="confirmacaoSenha" id="labelConfirmacaoSenha" class="block text-sm font-medium text-gray-700 mb-1">Confirme sua Senha*</label>
+                    <div class="relative">
+                        <input 
+                            type="password" 
+                            id="confirmacaoSenha" 
+                            name="confirmacaoSenha" 
+                            required
+                            aria-labelledby="labelConfirmacaoSenha" 
+                            aria-required="true"
+                            aria-describedby="senhaError"
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary pr-10"
+                            placeholder="Digite a senha novamente">
+                        <!-- Botão de mostrar/esconder senha -->
+                        <button 
+                            type="button" 
+                            onclick="togglePassword('confirmacaoSenha')"
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-primary focus:outline-none"
+                            aria-label="Mostrar senha"
+                            aria-controls="confirmacaoSenha">
+                            <svg id="eyeIcon-confirmacaoSenha" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <p id="senhaError" class="mt-1 text-sm text-danger hidden">As senhas não coincidem</p>
+                </div>
+
+                <!-- Termos e Condições -->
+                <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                        <input 
+                            id="termos" 
+                            name="termos" 
+                            type="checkbox" 
+                            required
+                            aria-labelledby="labelTermos termosError" 
+                            aria-required="true"
+                            class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded">
+                    </div>
+                    <div class="ml-3 text-sm">
+                        <label for="termos" id="labelTermos" class="font-medium text-gray-700">Concordo com os <a href="#" class="text-primary hover:underline">Termos de Serviço</a> e <a href="#" class="text-primary hover:underline">Política de Privacidade</a></label>
+                        <p id="termosError" class="mt-1 text-sm text-danger hidden">Você deve aceitar os termos</p>
+                    </div>
+                </div>
+                
+                <!-- Botão de Submit -->
+                <div class="pt-2">
+                    <button type="submit" id="submitBtn" class="w-full px-6 py-3 bg-primary text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                        Criar Conta
+                    </button>
+                    <button type="button" id="loadingBtn" class="w-full px-6 py-3 bg-primary text-white rounded-lg hidden" disabled>
+                        <div class="flex items-center justify-center">
+                            <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Criando conta...
+                        </div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto px-4 text-center">
+            <p>© 2025 CityBase - Plataforma Colaborativa</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registroForm');
+            const cpfInput = document.getElementById('cpf');
+            const usernameInput = document.getElementById('username');
+            const usernameLoading = document.getElementById('usernameLoading');
+            const usernameError = document.getElementById('usernameError');
+            const usernameSuccess = document.getElementById('usernameSuccess');
+            const senhaInput = document.getElementById('senha');
+            const confirmacaoSenhaInput = document.getElementById('confirmacaoSenha');
+            const termosCheckbox = document.getElementById('termos');
+            const submitBtn = document.getElementById('submitBtn');
+            const loadingBtn = document.getElementById('loadingBtn');
+            
+            // Máscara para CPF
+            cpfInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                
+                if (value.length > 3) {
+                    value = value.replace(/^(\d{3})(\d)/g, '$1.$2');
+                }
+                if (value.length > 6) {
+                    value = value.replace(/^(\d{3})\.(\d{3})(\d)/g, '$1.$2.$3');
+                }
+                if (value.length > 9) {
+                    value = value.replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/g, '$1.$2.$3-$4');
+                }
+                if (value.length > 11) {
+                    value = value.substring(0, 14);
+                }
+                
+                e.target.value = value;
+                
+                // Validação do CPF
+                const cpfError = document.getElementById('cpfError');
+                if (value.length === 14) {
+                    const cpfNumeros = value.replace(/\D/g, '');
+                    if (cpf.validate(cpfNumeros)) {
+                        cpfInput.classList.remove('invalid');
+                        cpfInput.classList.add('valid');
+                        cpfError.classList.add('hidden');
+                    } else {
+                        cpfInput.classList.remove('valid');
+                        cpfInput.classList.add('invalid');
+                        cpfError.classList.remove('hidden');
+                    }
+                } else {
+                    cpfInput.classList.remove('valid', 'invalid');
+                    cpfError.classList.add('hidden');
+                }
+            });
+            
+            // Verificação de nome de usuário único (simulada com debounce)
+            let usernameTimeout;
+            usernameInput.addEventListener('input', function() {
+                clearTimeout(usernameTimeout);
+                const username = this.value.trim();
+                
+                // Esconde mensagens anteriores
+                usernameError.classList.add('hidden');
+                usernameSuccess.classList.add('hidden');
+                usernameInput.classList.remove('valid', 'invalid');
+                
+                // Validação básica do formato
+                if (username.length < 4 || !/^[a-zA-Z0-9_]+$/.test(username)) {
+                    return;
+                }
+                
+                // Mostra loading
+                usernameLoading.classList.remove('hidden');
+                
+                // Simula verificação no servidor com debounce
+                usernameTimeout = setTimeout(() => {
+                    // Futuramente substituit por uma chamada fetch ao backend
+                    
+                    // Lista de usuários já existentes (simulação)
+                    const usuariosExistentes = ['admin', 'user123', 'teste'];
+                    
+                    // Simula tempo de resposta do servidor
+                    setTimeout(() => {
+                        usernameLoading.classList.add('hidden');
+                        
+                        if (usuariosExistentes.includes(username.toLowerCase())) {
+                            usernameInput.classList.add('invalid');
+                            usernameError.classList.remove('hidden');
+                        } else {
+                            usernameInput.classList.add('valid');
+                            usernameSuccess.classList.remove('hidden');
+                        }
+                    }, 800);
+                }, 500);
+            });
+            
+            // Validação de senha
+            confirmacaoSenhaInput.addEventListener('input', function() {
+                const senhaError = document.getElementById('senhaError');
+                if (senhaInput.value !== confirmacaoSenhaInput.value) {
+                    confirmacaoSenhaInput.classList.add('invalid');
+                    senhaError.classList.remove('hidden');
+                } else {
+                    confirmacaoSenhaInput.classList.remove('invalid');
+                    senhaError.classList.add('hidden');
+                }
+            });
+            
+            // Envio do formulário
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Validação final
+                let isValid = true;
+                
+                // Nome completo
+                if (!document.getElementById('nome').value.trim()) {
+                    document.getElementById('nomeError').classList.remove('hidden');
+                    document.getElementById('nome').classList.add('invalid');
+                    isValid = false;
+                }
+                
+                // CPF
+                const cpfValue = cpfInput.value.replace(/\D/g, '');
+                if (!cpf.validate(cpfValue)) {
+                    document.getElementById('cpfError').classList.remove('hidden');
+                    cpfInput.classList.add('invalid');
+                    isValid = false;
+                }
+                
+                // Nome de usuário
+                if (usernameInput.classList.contains('invalid') || !usernameInput.value.trim()) {
+                    usernameError.textContent = usernameInput.value.trim() ? 'Nome de usuário já em uso' : 'Campo obrigatório';
+                    usernameError.classList.remove('hidden');
+                    usernameInput.classList.add('invalid');
+                    isValid = false;
+                }
+                
+                // Senha
+                if (senhaInput.value.length < 8) {
+                    senhaInput.classList.add('invalid');
+                    document.getElementById('senhaError').textContent = 'Mínimo 8 caracteres';
+                    document.getElementById('senhaError').classList.remove('hidden');
+                    isValid = false;
+                } else if (senhaInput.value !== confirmacaoSenhaInput.value) {
+                    confirmacaoSenhaInput.classList.add('invalid');
+                    document.getElementById('senhaError').textContent = 'As senhas não coincidem';
+                    document.getElementById('senhaError').classList.remove('hidden');
+                    isValid = false;
+                }
+                
+                // Termos
+                if (!termosCheckbox.checked) {
+                    document.getElementById('termosError').classList.remove('hidden');
+                    isValid = false;
+                }
+                
+                // Se válido, simula o envio
+                if (isValid) {
+                    submitBtn.classList.add('hidden');
+                    loadingBtn.classList.remove('hidden');
+                    
+                    // Simulação de cadastro no backend
+                    setTimeout(() => {
+                        alert('Conta criada com sucesso! Redirecionando...');
+                        // Redireciona para a página de login após cadastro
+                        window.location.href = 'login.html';
+                    }, 1500);
+                }
+            });
+        });
+    </script>
+    
+    <!--Script para mostrar ou esconder a senha-->
+    <script>
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const eyeIcon = document.getElementById(`eyeIcon-${fieldId}`);
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />';
+            } else {
+                field.type = 'password';
+                eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
+            }
+        }
+    </script>
+</body>
+</html>

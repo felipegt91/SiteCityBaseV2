@@ -1,0 +1,74 @@
+/* 
+ * MELHORIA: Adicionado preload para fontes (opcional)
+ * Adicione isto no <head> do HTML: 
+ * <link rel="preload" href="https://fonts.googleapis.com/css2?family=REM:wght@400;500;600&display=swap" as="style">
+ */
+ body {
+    font-family: 'REM', sans-serif; /* Carrega mais rápido com preload */
+    line-height: 1.6;
+}
+
+/* MELHORIA: Otimização para renderização do mapa */
+#map-container, #detail-map {
+    height: 400px;
+    width: 100%;
+    border-radius: 0.75rem;
+    z-index: 1;
+    contain: layout paint; /* Isola rendering para performance */
+}
+
+#detail-map {
+    height: 300px;
+}
+
+/* MELHORIA: Evita repaints desnecessários nos marcadores */
+.problem-marker, .problem-marker-detail {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border-radius: 50%;
+    border: 2px solid white;
+    will-change: transform; /* Otimiza animações */
+}
+
+.problem-marker {
+    width: 32px;
+    height: 32px;
+    filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.3));
+}
+
+.problem-marker-detail {
+    width: 40px;
+    height: 40px;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+}
+
+/* MELHORIA: Tabelas mais performáticas */
+table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    /* Força aceleração GPU se houver scroll */
+    transform: translateZ(0);
+}
+
+th, td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+th {
+    background-color: #f3f4f6;
+    font-weight: 600;
+}
+
+/* MELHORIA: Media query otimizada */
+@media (max-width: 768px) {
+    #map-container, #detail-map {
+        height: 300px;
+        /* Reduz qualidade do mapa em mobile */
+        image-rendering: -webkit-optimize-contrast;
+    }
+}

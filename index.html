@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <!--Configurações e carregamento de estilos e bibliotecas necessárias-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CityBase | Registro de Problemas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=REM:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!--Configurações do Tailwind-->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['REM', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#4F46E5',
+                        urban: '#1E40AF',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 font-sans">
+
+    <!--Cabeçalho estilizado com logo e nome do site-->
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center space-x-3"> <!-- Link adicionado aqui -->
+                <div class="bg-primary text-white p-2 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                </div>
+                <h1 class="text-xl font-bold text-gray-800">CityBase</h1>
+            </a>
+            
+            <div class="hidden md:flex items-center justify-between w-full ml-6">
+                <nav class="flex space-x-6">
+                    <a href="novo-registro.html" class="font-medium hover:text-primary">Reportar</a>
+                    <a href="#status" class="font-medium hover:text-primary">Registros</a>
+                    <a href="#map" class="font-medium hover:text-primary">Mapa</a>
+                </nav>
+                <div class="flex items-center space-x-4 ml-6">
+                    <a href="login.html" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-indigo-600 transition">Login</a>
+                    <a href="cadastro.html" class="font-medium text-primary hover:underline">Cadastre-se</a>
+                </div>
+            </div>
+            
+            <button class="md:hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+
+        <!-- Seção com a tabela de registros -->
+        <section id="status" class="mb-16">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Registros Recentes</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th scope="col" class="py-3 px-4 text-left">REGISTRO</th>
+                            <th scope="col" class="py-3 px-4 text-left">Problema</th>
+                            <th scope="col" class="py-3 px-4 text-left">Data</th>
+                            <th scope="col" class="py-3 px-4 text-left">Dias</th>
+                            <th scope="col" class="py-3 px-4 text-left">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--Registro de teste-->
+                        <tr class="border-b border-gray-200 hover:bg-gray-50">
+                            <td class="py-3 px-4">REG-20240001</td>
+                            <td class="py-3 px-4">Buraco na via</td>
+                            <td class="py-3 px-4">15/05/2024</td>
+                            <td class="py-3 px-4" id="dias-registro">0 dias</td>
+                            <td class="py-3 px-4"><a href="detalhes.html?id=REG-20240001" class="text-primary hover:underline">Detalhes</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Mapa interativo -->
+        <section id="map" class="mb-16">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Localização do Problema</h2>
+            <div id="map-container" class="rounded-xl shadow-md"></div>
+        </section>
+    </main>
+
+    <!--Rodapé do site-->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="text-center">
+                <p>© 2025 CityBase. Plataforma colaborativa.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!--Script necessário para o mapa-->
+    <noscript>
+        <p>Ative o JavaScript para visualizar o mapa.</p>
+    </noscript>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Conversão de coordenadas
+        function parseDMS(input) {
+            const parts = input.match(/(\d+)°(\d+)'([\d.]+)"([SW])/);
+            if (!parts) return null;
+            
+            const degrees = parseFloat(parts[1]);
+            const minutes = parseFloat(parts[2]);
+            const seconds = parseFloat(parts[3]);
+            const direction = parts[4];
+            
+            let decimal = degrees + (minutes / 60) + (seconds / 3600);
+            return direction === 'S' || direction === 'W' ? -decimal : decimal;
+        }
+
+        // Coordenadas do problema (20°26'07.3"S 54°37'09.9"W)
+        const lat = parseDMS("20°26'07.3\"S");
+        const lng = parseDMS("54°37'09.9\"W");
+
+        // Inicialização do mapa
+        document.addEventListener('DOMContentLoaded', () => {
+            // Cálculo de dias
+            const dataRegistro = '15/05/2024';
+            const [dia, mes, ano] = dataRegistro.split('/');
+            const diff = new Date() - new Date(ano, mes-1, dia);
+            const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+            document.getElementById('dias-registro').textContent = `${dias} ${dias === 1 ? 'dia' : 'dias'}`;
+
+            // Mapa principal
+            const map = L.map('map-container').setView([lat, lng], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+            
+            // Marcador do problema no mapa
+            L.marker([lat, lng], {
+                icon: L.divIcon({
+                    className: 'problem-marker',
+                    html: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#DC2626"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>',
+                    iconSize: [32, 32]
+                })
+            })
+            .bindPopup(`
+                <b>Buraco na via</b><br>
+                REG-20240001<br>
+                <small>${lat.toFixed(6)}, ${lng.toFixed(6)}</small>
+            `)
+            .addTo(map);
+        });
+    </script>
+    <script>
+        // Menu mobile
+        document.querySelector('.md\\:hidden').addEventListener('click', () => {
+            const nav = document.querySelector('.md\\:flex nav');
+            nav.classList.toggle('hidden');
+            nav.classList.toggle('flex');
+            nav.classList.toggle('flex-col');
+            nav.classList.toggle('absolute');
+            nav.classList.toggle('top-16');
+            nav.classList.toggle('left-0');
+            nav.classList.toggle('bg-white');
+            nav.classList.toggle('w-full');
+            nav.classList.toggle('p-4');
+            nav.classList.toggle('shadow-md');
+        });
+    
+    </script>
+</body>
+</html>
