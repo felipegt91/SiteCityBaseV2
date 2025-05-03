@@ -36,3 +36,12 @@ CREATE TABLE reports (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (report_id) REFERENCES reports(id)
 );
+
+-- Tabela das fotos dos registros
+CREATE TABLE report_photos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    report_id INT NOT NULL,
+    photo_path VARCHAR(255) NOT NULL,
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (report_id) REFERENCES reports(id) ON DELETE CASCADE
+);
