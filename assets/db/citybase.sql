@@ -1,5 +1,5 @@
 -- Criação da base de dados
-CREATE DATABASE IF NOT EXISTS citybase;
+CREATE DATABASE IF NOT EXISTS citybase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE citybase;
 
 -- Tabela de usuários
@@ -12,7 +12,7 @@ CREATE TABLE usuarios (
     password_hash VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+) ENGINE=InnoDB;
 
 -- Tabela de tipos de problemas
 CREATE TABLE problem_types (
@@ -20,7 +20,7 @@ CREATE TABLE problem_types (
     name VARCHAR(50) NOT NULL UNIQUE,
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+) ENGINE=InnoDB;
 
 -- Tabela dos registros de problemas
 CREATE TABLE reports (
@@ -35,7 +35,7 @@ CREATE TABLE reports (
     longitude DECIMAL(11, 8) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (report_id) REFERENCES reports(id)
-);
+) ENGINE=InnoDB;
 
 -- Tabela das fotos dos registros
 CREATE TABLE report_photos (
@@ -44,7 +44,7 @@ CREATE TABLE report_photos (
     photo_path VARCHAR(255) NOT NULL,
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (report_id) REFERENCES reports(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB;
 
 -- Inserção de tipos de problemas iniciais
 INSERT INTO problem_types (name, description) VALUES
