@@ -45,3 +45,11 @@ CREATE TABLE report_photos (
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (report_id) REFERENCES reports(id) ON DELETE CASCADE
 );
+
+-- Inserção de tipos de problemas iniciais
+INSERT INTO problem_types (name, description) VALUES
+('Buraco na via'),
+('Iluminação pública'),
+('Lixo'),
+('Água e esgoto'),
+('Outros');
