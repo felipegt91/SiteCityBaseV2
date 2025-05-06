@@ -75,3 +75,21 @@ INSERT INTO users (name, email, cpf, username, password_hash) VALUES
 -- Usuário de teste (senha: 123456)
 INSERT INTO users (name, email, cpf, username, password_hash) VALUES
 ('Usuário Teste', 'teste@citybase.com', '111.222.333-44', 'testuser', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MQDqUiz8CZA5ZQ7zP6SXJY1tYj7XJ2K');
+
+-- Registro exemplo
+INSERT INTO reports (
+    registration_code,
+    user_id,
+    problem_type_id,
+    title,
+    description,
+    address,
+    latitude,
+    longitude
+) VALUES 
+('REG-20240001', 2, 1, 'Buraco na Avenida Principal', 
+ 'Buraco de aproximadamente 50cm de diâmetro na pista direita', 
+ 'Av. Principal, 1000 - Centro', -23.550520, -46.633308),
+('REG-20240002', 2, 2, 'Poste de luz quebrado', 
+ 'Poste número 45 sem iluminação há 3 dias', 
+ 'Rua das Flores, 45 - Jardim', -23.548900, -46.634200);
