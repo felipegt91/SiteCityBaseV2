@@ -71,3 +71,7 @@ INSERT INTO problem_types (name, description) VALUES
 -- Usuário admin inicial (senha: admin123) - para teste
 INSERT INTO usuarios (name, email, cpf, username, password_hash) VALUES
 ('Administrador', 'admin@example.com', '000.000.000-00', 'admin', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MQDqUiz8CZA5ZQ7zP6SXJY1tYj7XJ2K');
+
+-- Usuário de teste (senha: 123456)
+INSERT INTO users (name, email, cpf, username, password_hash) VALUES
+('Usuário Teste', 'teste@citybase.com', '111.222.333-44', 'testuser', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MQDqUiz8CZA5ZQ7zP6SXJY1tYj7XJ2K');
