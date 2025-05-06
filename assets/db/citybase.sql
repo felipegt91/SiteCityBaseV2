@@ -52,7 +52,12 @@ CREATE TABLE report_photos (
     report_id INT NOT NULL,
     photo_path VARCHAR(255) NOT NULL,
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (report_id) REFERENCES reports(id) ON DELETE CASCADE
+    FOREIGN KEY (report_id) REFERENCES reports(id) ON DELETE CASCADE,
+    CONSTRAINT chk_photo_path CHECK (
+        photo_path LIKE '%.jpg' OR
+        photo_path LIKE '%.jpeg' OR
+        photo_path LIKE '%.png' OR
+    )
 ) ENGINE=InnoDB;
 
 -- Inserção de tipos de problemas iniciais
