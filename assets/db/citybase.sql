@@ -29,7 +29,7 @@ CREATE TABLE problem_types (
 -- Tabela dos registros de problemas
 CREATE TABLE reports (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    registration_code VARCHAR(20) NOT NULL UNIQUE,
+    registration_code VARCHAR(20) UNIQUE,
     user_id INT NOT NULL,
     problem_type_id INT NOT NULL,
     title VARCHAR(100) NOT NULL,
@@ -45,6 +45,31 @@ CREATE TABLE reports (
         longitude BETWEEN -180 AND 180
     )
 ) ENGINE=InnoDB;
+
+-- Trigger para geração automática do registration_code
+DELIMITER //
+CREATE TRIGGER before_report_insert
+BEFORE INSERT ON reports
+FOR EACH ROW
+BEGIN
+    DECLARE next_sq INT;
+    DECLARE current_year CHAR(4);
+
+    SET current_year = YEAR(NEW.created_at);
+
+    -- Próximo número da sequência para o ano
+    SELECT COALESCE(MAX(CAST(SUBSTRING(registration_code, 10) AS UNSIGNED)))
+    + 1 INTO next_seq
+    FROM reports
+    WHERE registration_code LIKE CONCAT('REG-', current_year, '%');
+
+    -- Começa com 1 se não houver registros no ano
+    SET next_seq = IFNULL(next_seq, 1);
+
+    -- Definição do formato
+    SET NEW.registration_code = CONCAT('REG-', current_year, LPAD(next_seq, 4, '0'));
+END //
+DELIMITER ;
 
 -- Tabela das fotos dos registros
 CREATE TABLE report_photos (
