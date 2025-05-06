@@ -76,7 +76,7 @@ INSERT INTO users (name, email, cpf, username, password_hash) VALUES
 INSERT INTO users (name, email, cpf, username, password_hash) VALUES
 ('Usuário Teste', 'teste@citybase.com', '111.222.333-44', 'testuser', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MQDqUiz8CZA5ZQ7zP6SXJY1tYj7XJ2K');
 
--- Registro exemplo
+-- Exemplo de registro
 INSERT INTO reports (
     registration_code,
     user_id,
@@ -93,3 +93,9 @@ INSERT INTO reports (
 ('REG-20240002', 2, 2, 'Poste de luz quebrado', 
  'Poste número 45 sem iluminação há 3 dias', 
  'Rua das Flores, 45 - Jardim', -23.548900, -46.634200);
+
+-- Fotos de exemplo do registro
+INSERT INTO report_photos (report_id, photo_path) VALUES
+(1, 'uploads/reports/1/photo1.jpg'),
+(1, 'uploads/reports/1/photo2.jpg'),
+(2, 'uploads/reports/2/photo1.jpg');
