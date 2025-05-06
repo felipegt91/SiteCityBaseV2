@@ -38,7 +38,7 @@ CREATE TABLE reports (
     latitude DECIMAL(10, 8) NOT NULL,
     longitude DECIMAL(11, 8) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id);
+    FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (problem_type_id) REFERENCES problem_types(id),
     CONSTRAINT chk_coords CHECK (
         latitude BETWEEN -90 AND 90 AND
@@ -56,7 +56,7 @@ CREATE TABLE report_photos (
     CONSTRAINT chk_photo_path CHECK (
         photo_path LIKE '%.jpg' OR
         photo_path LIKE '%.jpeg' OR
-        photo_path LIKE '%.png' OR
+        photo_path LIKE '%.png'
     )
 ) ENGINE=InnoDB;
 
