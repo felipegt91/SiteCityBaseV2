@@ -1,5 +1,8 @@
 -- Criação da base de dados
-CREATE DATABASE IF NOT EXISTS citybase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS citybase 
+CHARACTER SET utf8mb4 
+COLLATE utf8mb4_unicode_ci;
+
 USE citybase;
 
 -- Tabela de usuários
