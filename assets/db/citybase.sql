@@ -26,7 +26,7 @@ CREATE TABLE problem_types (
 CREATE TABLE reports (
     id INT AUTO_INCREMENT PRIMARY KEY,
     registration_code VARCHAR(20) NOT NULL UNIQUE,
-    user_id INT NOT NULL
+    user_id INT NOT NULL,
     problem_type_id INT NOT NULL,
     title VARCHAR(100) NOT NULL,
     description TEXT NOT NULL,
@@ -34,7 +34,8 @@ CREATE TABLE reports (
     latitude DECIMAL(10, 8) NOT NULL,
     longitude DECIMAL(11, 8) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (report_id) REFERENCES reports(id)
+    FOREIGN KEY (user_id) REFERENCES usuarios(id);
+    FOREIGN KEY (problem_type_id) REFERENCES problem_types(id)
 ) ENGINE=InnoDB;
 
 -- Tabela das fotos dos registros
@@ -48,12 +49,12 @@ CREATE TABLE report_photos (
 
 -- Inserção de tipos de problemas iniciais
 INSERT INTO problem_types (name, description) VALUES
-('Buraco na via'),
-('Iluminação pública'),
-('Lixo'),
-('Água e esgoto'),
-('Outros');
+('Buraco na via', 'Buraco em via pública'),
+('Iluminação pública', 'Problemas com iluminação pública'),
+('Lixo', 'Acúmulo de lixo em locais inadequados'),
+('Água e esgoto', 'Problemas com água ou esgoto'),
+('Outros', 'Outros tipos de problemas urbanos');
 
 -- Usuário admin inicial (senha: admin123) - para teste
-INSERT INTO users (name, email, cpf, username, password_hash) VALUES
+INSERT INTO usuarios (name, email, cpf, username, password_hash) VALUES
 ('Administrador', 'admin@example.com', '000.000.000-00', 'admin', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MQDqUiz8CZA5ZQ7zP6SXJY1tYj7XJ2K');
