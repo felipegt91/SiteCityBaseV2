@@ -34,12 +34,16 @@ CREATE TABLE reports (
     problem_type_id INT NOT NULL,
     title VARCHAR(100) NOT NULL,
     description TEXT NOT NULL,
-    address TEXT NOT NULL,
+    address VARCHAR(255) NOT NULL,
     latitude DECIMAL(10, 8) NOT NULL,
     longitude DECIMAL(11, 8) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES usuarios(id);
-    FOREIGN KEY (problem_type_id) REFERENCES problem_types(id)
+    FOREIGN KEY (user_id) REFERENCES users(id);
+    FOREIGN KEY (problem_type_id) REFERENCES problem_types(id),
+    CONSTRAINT chk_coords CHECK (
+        latitude BETWEEN -90 AND 90 AND
+        longitude BETWEEN -180 AND 180
+    )
 ) ENGINE=InnoDB;
 
 -- Tabela das fotos dos registros
