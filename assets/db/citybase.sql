@@ -52,14 +52,14 @@ CREATE TRIGGER before_report_insert
 BEFORE INSERT ON reports
 FOR EACH ROW
 BEGIN
-    DECLARE next_sq INT;
+    DECLARE next_seq INT;
     DECLARE current_year CHAR(4);
 
     SET current_year = YEAR(NEW.created_at);
 
     -- Próximo número da sequência para o ano
-    SELECT COALESCE(MAX(CAST(SUBSTRING(registration_code, 10) AS UNSIGNED)))
-    + 1 INTO next_seq
+    SELECT COALESCE(MAX(CAST(SUBSTRING(registration_code, 10) AS UNSIGNED)) 0) + 1 
+    INTO next_seq
     FROM reports
     WHERE registration_code LIKE CONCAT('REG-', current_year, '%');
 
@@ -112,10 +112,10 @@ INSERT INTO reports (
     latitude,
     longitude
 ) VALUES 
-('REG-20240001', 2, 1, 'Buraco na Avenida Principal', 
+(2, 1, 'Buraco na Avenida Principal', 
  'Buraco de aproximadamente 50cm de diâmetro na pista direita', 
  'Av. Principal, 1000 - Centro', -23.550520, -46.633308),
-('REG-20240002', 2, 2, 'Poste de luz quebrado', 
+(2, 2, 'Poste de luz quebrado', 
  'Poste número 45 sem iluminação há 3 dias', 
  'Rua das Flores, 45 - Jardim', -23.548900, -46.634200);
 
