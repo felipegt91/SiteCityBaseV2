@@ -58,17 +58,19 @@ BEGIN
     SET current_year = YEAR(NEW.created_at);
 
     -- Próximo número da sequência para o ano
-    SELECT COALESCE(MAX(CAST(SUBSTRING(registration_code, 10) AS UNSIGNED)) 0) + 1 
+    SELECT COALESCE(MAX(CAST(SUBSTRING(registration_code, 10) AS UNSIGNED)), 0) + 1 
     INTO next_seq
     FROM reports
     WHERE registration_code LIKE CONCAT('REG-', current_year, '%');
 
     -- Começa com 1 se não houver registros no ano
-    SET next_seq = IFNULL(next_seq, 1);
+    IF next_seq IS NULL THEN
+        SET next_seq = 1;
+    END IF;
 
     -- Definição do formato
     SET NEW.registration_code = CONCAT('REG-', current_year, LPAD(next_seq, 4, '0'));
-END //
+END//
 DELIMITER ;
 
 -- Tabela das fotos dos registros
