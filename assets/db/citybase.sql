@@ -5,6 +5,11 @@ COLLATE utf8mb4_unicode_ci;
 
 USE citybase;
 
+-- Criação de índices para melhor desempenho
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_username ON users(username);
+CREATE INDEX idx_reports_location ON reports(latitude, longitude);
+
 -- Tabela de usuários
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
