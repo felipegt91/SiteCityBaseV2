@@ -198,15 +198,14 @@
                     document.getElementById('loadingBtn').classList.remove('hidden');
                     
                     setTimeout(() => {
-                        // Simulação: credenciais válidas
                         if (emailField.value === 'admin@example.com' && senhaField.value === 'admin123') {
                             localStorage.setItem('citybase_user', JSON.stringify({
                                 name: "Administrador",
                                 email: emailField.value
                             }));
-                            window.location.href = 'index.html';
+                            const redirectTo = new URLSearchParams(window.location.search).get('redirect') || 'index.html';
+                            window.location.href = redirectTo;
                         } else {
-                            // Credenciais inválidas
                             errorMessage.textContent = 'E-mail ou senha incorretos';
                             errorMessage.classList.remove('hidden');
                             document.getElementById('loadingBtn').classList.add('hidden');
