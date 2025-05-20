@@ -136,12 +136,17 @@
         // Inicialização do mapa
         document.addEventListener('DOMContentLoaded', () => {
             // Cálculo de dias
-            const dataRegistro = '15/05/2024';
-            const [dia, mes, ano] = dataRegistro.split('/');
-            const diff = new Date() - new Date(ano, mes-1, dia);
-            const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
-            document.getElementById('dias-registro').textContent = `${dias} ${dias === 1 ? 'dia' : 'dias'}`;
+            function calcularDias(dataRegistro) {
+                const [dia, mes, ano] = dataRegistro.split('/');
+                const hoje = new Date();
+                const dataReg = new Date(ano, mes-1, dia);
 
+                hoje.setHours(0, 0, 0, 0);
+                dataReg.setHours(0, 0, 0, 0);
+                    
+                const diff = hoje - dataReg;
+                return Math.floor(diff / (1000 * 60 * 60 * 24));
+            }
             // Mapa principal
             const map = L.map('map-container').setView([lat, lng], 15);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
