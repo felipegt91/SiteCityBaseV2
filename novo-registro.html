@@ -261,6 +261,14 @@
                     navigator.geolocation.getCurrentPosition(
                         (position) => {
                             const { latitude, longitude } = position.coords;
+        
+                            if (!validateCoordinates(latitude, longitude)) {
+                                locationStatus.textContent = 'Localização inválida obtida';
+                                getLocationBtn.textContent = 'Tentar novamente';
+                                getLocationBtn.disabled = false;
+                                return;
+                            }
+        
                             getAddressFromCoords(latitude, longitude)
                                 .then(address => {
                                     locationInput.value = address;
