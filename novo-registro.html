@@ -283,6 +283,14 @@
                     getLocationBtn.disabled = true;
                 }
             });
+
+            // Validação de coordenadas
+            function validateCoordinates(lat, lng) {
+                return (
+                    lat >= -90 && lat <= 90 &&
+                    lng >= -180 && lng <= 180
+                );
+            }
             
             // Simulação de API de geocodificação
             function getAddressFromCoords(lat, lng) {
