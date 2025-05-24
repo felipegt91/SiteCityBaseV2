@@ -12,10 +12,10 @@ function calcularDias(dataRegistro) {
 }
 
 
-// Atualiza o elemento de dias no HTML (você precisará garantir que o ID existe)
+// Atualiza o elemento de dias no HTML
 const diasDetalheElement = document.getElementById('dias-detalhe');
 if (diasDetalheElement) {
-     // Supondo que a data do registro esteja acessível ou seja fixa como no exemplo original
-    const dataDoRegistroOriginal = "15/05/2024"; // Precisa tornar isso dinâmico ou buscar do HTML
+     // Data do registro fixa
+    const dataDoRegistroOriginal = "15/05/2024"; // Tornar a data dinâmica
     diasDetalheElement.textContent = `${calcularDias(dataDoRegistroOriginal)} dias`;
 }
