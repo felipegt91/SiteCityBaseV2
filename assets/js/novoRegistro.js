@@ -90,12 +90,54 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Obtenção do endereço a partir das coordenadas
     function getAddressFromCoords(lat, lng) {
-        return new Promise(resolve => {
-            setTimeout(() => {
-                resolve(`Próximo a ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
-            }, 1000);
-        });
+        const locationStatus = document.getElementById('locationStatus');
+        if (locationStatus) {
+            locationStatus.textContent = 'Buscando endereço para as coordenadas...';
+        }
+        
+        const nominatimUrl = 'https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1';
+        
+        return fetch(nominatimUrl)
+            .then(response => {
+                if (!response.ok) {
+                    //Lança erro se a resposta não for OK
+                    throw new Error('Erro na requisição ao Nominatim: ${response.statusText}');
+                }
+                return response.json(); // conversão da resposta para JSON
+            })
+            .then(data => {
+                //verifica o retorno do endereço pelo Nominatim
+                if (data && data.display_name) {
+                    if (locationStatus) {
+                        locationStatus.textContent = 'Endereço obtido:  ${data.display_name.substring(0,50)}...';
+                    }
+                    return data.display_name;
+                } else if (data && data.error) {
+                    // se o Nominatim retornar um erro específico
+                    console.error('Erro do Nominatim:', data.error);
+                    if (locarionStatus) {
+                        locationStatus.textContent = 'Não foi possível encontrar um endereço para estas coordenadas.';
+                    }
+                    return 'Coordenadas: ${lat.toFixed(6)}, ${lng.toFixed(6)} (Endereço não encontrado)';
+                } else {
+                    //Caso não encontre o endereço ou a resposta seja inesperada
+                    if (locarionStatus) {
+                        locationStatus.textContent = 'Endereço não encontrado para estas coordenadas.';
+                    }
+                    return 'Coordenadas: ${lat.toFixed(6)}, ${lng.toFixed(6)} (Endereço não especificado)';
+                }    
+            })
+            .catch(error => {
+                //Captura erros de rede ou erros lançados manualmente
+                console.error('Falha ao obter endereço do Nominatim:', error);
+                if (locationStatus) {
+                    locationStatus.textContent = 'Falha ao buscar endereço. Verifique a conexão.';
+                }
+                //Retorna uma string indicando o erro ou as coordenadas como fallback
+                return 'Erro ao buscar endereço. Usando coordenadas: ${lat.toFixed(6)}, ${lng.toFixed(6)}';
+            });           
     }
+    
 
     if(fileInput && fileNameSpan && preview) {
         fileInput.addEventListener('change', function(e) {
