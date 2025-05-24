@@ -62,3 +62,32 @@ function togglePasswordVisibility(fieldId, eyeIconId) { // Renomeado para clarez
         }
     }
 }
+
+// Menu mobile de novo-registro.html e logout
+function initDynamicMobileMenu() {
+    const mobileMenuButton = document.querySelector('header .md\\:hidden button'); // Seletor para o botão do menu
+    const mobileMenuContent = document.getElementById('mobileMenu'); // ID do conteúdo do menu
+
+    if (mobileMenuButton && mobileMenuContent) {
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenuContent.classList.toggle('hidden');
+
+            // Sincroniza nome do usuário se o menu estiver sendo aberto
+            if (!mobileMenuContent.classList.contains('hidden')) {
+                const userNameDesktop = document.getElementById('userName');
+                const mobileUserNameSpan = document.getElementById('mobileUserName');
+                if (userNameDesktop && mobileUserNameSpan) {
+                    mobileUserNameSpan.textContent = userNameDesktop.textContent;
+                }
+            }
+        });
+    }
+
+    const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+    if (mobileLogoutBtn) {
+        mobileLogoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('citybase_user');
+            window.location.href = 'login.html';
+        });
+    }
+}
