@@ -89,9 +89,9 @@
                         <input type="password" id="senha" name="senha" required
                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent pr-10"
                                placeholder="Digite sua senha">
-                        <button type="button" onclick="togglePassword('senha')" 
+                        <button type="button" onclick="togglePasswordVisibility('senha', 'eyeIcon-senha-svg')" 
                                 class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-primary">
-                            <svg id="eyeIcon-senha" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg id="eyeIcon-senha-svg" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
@@ -140,86 +140,6 @@
         </div>
     </footer>
 
-    <script>
-        // Função para mostrar/esconder senha
-        function togglePassword(fieldId) {
-            const field = document.getElementById(fieldId);
-            const eyeIcon = document.getElementById(`eyeIcon-${fieldId}`);
-            
-            if (field.type === 'password') {
-                field.type = 'text';
-                eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />';
-            } else {
-                field.type = 'password';
-                eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('loginForm');
-            const emailField = document.getElementById('email');
-            const senhaField = document.getElementById('senha');
-            const errorMessage = document.getElementById('errorMessage');
-            
-            // Validação em tempo real do e-mail
-            emailField.addEventListener('input', function() {
-                const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.value);
-                this.classList.toggle('invalid', !isValid && this.value.length > 0);
-                document.getElementById('emailError').classList.toggle('hidden', isValid || this.value.length === 0);
-            });
-            
-            // Validação do formulário
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Resetar mensagens de erro
-                errorMessage.classList.add('hidden');
-                document.getElementById('emailError').classList.add('hidden');
-                document.getElementById('senhaError').classList.add('hidden');
-                
-                // Validação básica
-                let isValid = true;
-                
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailField.value)) {
-                    emailField.classList.add('invalid');
-                    document.getElementById('emailError').classList.remove('hidden');
-                    isValid = false;
-                }
-                
-                if (!senhaField.value.trim()) {
-                    senhaField.classList.add('invalid');
-                    document.getElementById('senhaError').classList.remove('hidden');
-                    isValid = false;
-                }
-                
-                if (isValid) {
-                    // Simular autenticação
-                    document.getElementById('submitBtn').classList.add('hidden');
-                    document.getElementById('loadingBtn').classList.remove('hidden');
-                    
-                    setTimeout(() => {
-                        if (emailField.value === 'admin@example.com' && senhaField.value === 'admin123') {
-                            localStorage.setItem('citybase_user', JSON.stringify({
-                                name: "Administrador",
-                                email: emailField.value
-                            }));
-                            const redirectTo = new URLSearchParams(window.location.search).get('redirect') || 'index.html';
-                            window.location.href = redirectTo;
-                        } else {
-                            errorMessage.textContent = 'E-mail ou senha incorretos';
-                            errorMessage.classList.remove('hidden');
-                            document.getElementById('loadingBtn').classList.add('hidden');
-                            document.getElementById('submitBtn').classList.remove('hidden');
-                        }
-                    }, 1000);
-                }
-            });
-            
-            // Se já estiver logado, redireciona
-            if (localStorage.getItem('citybase_user')) {
-                window.location.href = 'index.html';
-            }
-        });
-    </script>
+<script src="assets/js/sharedUtils.js" defer></script> <script src="assets/js/login.js" defer></script>
 </body>
 </html>
