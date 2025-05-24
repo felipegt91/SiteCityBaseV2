@@ -110,7 +110,6 @@ INSERT INTO users (name, email, cpf, username, password_hash) VALUES
 
 -- Exemplo de registro
 INSERT INTO reports (
-    registration_code,
     user_id,
     problem_type_id,
     title,
