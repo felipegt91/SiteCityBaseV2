@@ -39,46 +39,78 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         getLocationBtn.addEventListener('click', () => {
+            //Gerenciamento visual dos botões e campos de input
             manualLocationBtn.classList.remove('bg-primary', 'text-white');
             manualLocationBtn.classList.add('border', 'border-gray-300', 'bg-gray-50');
             getLocationBtn.classList.remove('border', 'border-gray-300', 'bg-gray-50');
             getLocationBtn.classList.add('bg-primary', 'text-white');
             manualLocationField.classList.add('hidden');
             manualLocationInput.removeAttribute('required');
-            locationInput.setAttribute('required', '');
-            getLocationBtn.disabled = true;
-            getLocationBtn.textContent = 'Obtendo...';
-            locationStatus.textContent = 'Obtendo localização...';
+            locationInput.setAttribute('required', ''); // Garante que o campo de endereço automático seja obrigatório
 
+            // Desabilita o botão e mostra status de carregamento
+            getLocationBtn.disabled = true;
+            getLocationBtn.textContent = 'Obtendo Coordenadas...';
+            locationStatus.textContent = 'Solicitando sua localização...';
+
+            // Lógica de Geolocalização
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         const { latitude, longitude } = position.coords;
+
+                        // Validação de coordenadas
                         if (!validateCoordinates(latitude, longitude)) {
-                            locationStatus.textContent = 'Localização inválida obtida';
-                            getLocationBtn.textContent = 'Tentar novamente';
+                            locationStatus.textContent = 'Coordenadas inválidas obtidas.';
+                            getLocationBtn.textContent = 'Tentar Novamente';
                             getLocationBtn.disabled = false;
                             return;
                         }
+
+                        // Atualiza o status para indicar que está buscando o endereço
+                        locationStatus.textContent = `Coordenadas obtidas: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}. Buscando endereço...`;
+                        getLocationBtn.textContent = 'Buscando Endereço...';
+
+
+                        // Chamada para a nova função getAddressFromCoords (usando Nominatim)
                         getAddressFromCoords(latitude, longitude)
-                            .then(address => {
-                                locationInput.value = address;
-                                locationInput.classList.remove('hidden');
-                                locationStatus.textContent = `Localização obtida: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+                            .then(address => { // 'address' será o valor resolvido pela Promise
+                                locationInput.value = address; // Preenche o campo de endereço
+                                locationInput.classList.remove('hidden'); // Mostra o campo de endereço
+
                                 const locError = document.getElementById('localizacaoError');
-                                if(locError) locError.classList.add('hidden');
+                                if (locError) locError.classList.add('hidden'); // Esconde mensagem de erro de localização se houver
+
+                                // Atualiza o texto do botão e reabilita se necessário
+                                getLocationBtn.textContent = 'Localização e Endereço Obtidos!';
+                            })
+                            .catch(error => {
+                                // fallback caso a Promise de getAddressFromCoords seja rejeitada
+                                // e o erro não tenha sido tratado completamente dentro dela.
+                                console.error("Erro final ao tentar obter e processar endereço: ", error);
+                                locationStatus.textContent = 'Ocorreu um erro ao buscar o endereço.';
+                                locationInput.value = `Coordenadas: ${latitude.toFixed(6)}, ${longitude.toFixed(6)} (Falha ao buscar endereço)`;
+                                locationInput.classList.remove('hidden');
+                                getLocationBtn.textContent = 'Tentar Novamente';
+                                getLocationBtn.disabled = false;
                             });
-                        getLocationBtn.textContent = 'Localização obtida';
+
                     },
-                    (error) => {
-                        locationStatus.textContent = 'Erro ao obter localização: ' + (error.message || 'Permissão negada');
-                        getLocationBtn.textContent = 'Tentar novamente';
+                    (error) => { // Callback de erro do navigator.geolocation.getCurrentPosition
+                        locationStatus.textContent = 'Erro ao obter sua localização: ' + (error.message || 'Permissão negada.');
+                        getLocationBtn.textContent = 'Tentar Novamente';
                         getLocationBtn.disabled = false;
+                    },
+                    {
+                        enableHighAccuracy: true, // Tenta obter a localização mais precisa
+                        timeout: 10000,           // Tempo máximo para obter a localização (10 segundos)
+                        maximumAge: 0             // Não usar cache de localização
                     }
                 );
             } else {
-                locationStatus.textContent = 'Geolocalização não suportada';
-                getLocationBtn.disabled = true;
+                locationStatus.textContent = 'Geolocalização não é suportada pelo seu navegador.';
+                getLocationBtn.disabled = true; // Desabilita permanentemente se não houver suporte
+                getLocationBtn.textContent = 'Geolocalização Indisponível';
             }
         });
     }
